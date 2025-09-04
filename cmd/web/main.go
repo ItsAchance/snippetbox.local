@@ -2,8 +2,10 @@ package main
 
 import (
 	"flag"
-	"log"
+	//"log"
+	"log/slog"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -22,8 +24,11 @@ func main() {
 	mux.HandleFunc("GET /snippet/create", snippetCreate)
 	mux.HandleFunc("POST /snippet/create", snippetCreatePost)
 
-	log.Printf("Starting server on localhost%v\n", *addr)
+	logHandler := slog.NewTextHandler(os.Stdout, nil)
+	logger := slog.New(logHandler)
+	logger.Info("Starting server on localhost", "Port", *addr)
 
 	err := http.ListenAndServe(*addr, mux)
-	log.Fatal(err)
+	logger.Error(err.Error())
+	os.Exit(1)
 }
